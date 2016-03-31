@@ -2,12 +2,15 @@
 <html>
 <head>
 <title>Vertex - Triangle count converter </title>
+<link rel="stylesheet" type="text/css" href="./styles.css" />
 </head>
 <body>
-Number of Gaps <input type="text" id="gaps" value="0" oninput="processFunction(this)"><br>
-Number of Holes <input type="text" id="holes" value="0" oninput="processFunction(this)"><br>
-Number of Vertices <input type="text" id="vertices" value="4" oninput="processFunction(this)"><br>
-Number of Triangles <input type="text" id="triangles" value"4" oninput="processFunction(this)"><br>
+<section>
+	<label>Number of Gaps </label><input type="text" id="gaps" value="0" oninput="processFunction(this)"><br>
+	<label>Number of Holes </label><input type="text" id="holes" value="0" oninput="processFunction(this)"><br>
+	<label>Number of Vertices </label><input type="text" id="vertices" value="4" oninput="processFunction(this)"><br>
+	<label>Number of Triangles </label><input type="text" id="triangles" value"4" oninput="processFunction(this)"><br>
+</section>
 
 <p id="demo"></p>
 <script>
