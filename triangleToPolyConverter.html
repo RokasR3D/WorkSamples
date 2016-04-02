@@ -5,27 +5,60 @@
 <link rel="stylesheet" type="text/css" href="./styles.css" />
 </head>
 <body>
-<section>
+<div class="container">
 	<label>Number of Gaps </label><input type="text" id="gaps" value="0" oninput="processFunction(this)"><br>
+	<div class="subsection" id="gapsBreakdown"> </div>
 	<label>Number of Holes </label><input type="text" id="holes" value="0" oninput="processFunction(this)"><br>
 	<label>Number of Vertices </label><input type="text" id="vertices" value="4" oninput="processFunction(this)"><br>
 	<label>Number of Triangles </label><input type="text" id="triangles" value"4" oninput="processFunction(this)"><br>
-</section>
+</div>
+<p>This page is here to demonstrate the relationship between triangle and vertex count. Heavy geomtery slows down rendering. Especialy in real time. Because of this, we want to put limits on our geometry. Traditionaly it has been expressed in terms of polycount. Polygons seem to contribute more directly to the look of a model. At the same time there is an argument to be made for using a vertex count. Vertices are the atomic building blocks of geometry. Face are built in between them. Each vertex adds three coordinates to the size of the geometry and so contributes more directly to the memory and processing requirements.</p>
+<p>While in practice you would always use whatever program you are modeling in to check you triangle/vertex count, the realtionship between them is interesting from mathematical point of view. It is not a simple matter of multiplying triangle count by three to get the number of vertices as vertices might be shared between triangles.</p>
+<p>Let's start with chi, pronounced khay, looks like an X. Chi is the Euler characteristic and is defined as <b>chi=V-E+F</b>. Where V, E and F are the number of vertices, edges and faces respectively. For any surface topologicaly similar to a sphere (any sufrace without any holes) chi is 2.</p>
+<p> Surface equivalent to a torus, such as a coffe cup, have chi of 0.</p>
+<p> For every hole in the surface the chi goes down by two. Chi for objects with two holes is -2</p>
+<p> Let's say we have a completely closed surface and we only know the number of vertices. How can we find out the number of faces? </p>
+
+
 
 <p id="demo"></p>
 <script>
 function processFunction(element){
 	numericValue = element.value.replace(/[^\d]/,'');
 	element.value = numericValue;
+	gapsBreakdown = document.getElementById("gapsBreakdown");
+	//gapsBreakdown.innerHtml = "<label> what the hell</label>" ;
 	// document.getElementById("demo").innerHTML = "output " + numericValue;
-	if( element.name == "triangle") {
+	if ( element.id == "gaps") {
+		//gapsBreakdown = document.getElementById("gapsBreakdown");
+		gapBreakdownText = "";
+		for (i=0; i < numericValue; i++) {
+		//	numberOfVertices = "<label> number of vertices on edge </label><input type=\"text\" value=3> <br>";
+			gapBreakdownText += "<label> Vertices along the edge </label><input type=\"text\" ";
+			gapBreakdownText += "id=\"gapBreakdown-"+i+ "\" value=3 oninput=\"processFunction(this)\"><br>";
+		}
+		gapsBreakdown.innerHTML = gapBreakdownText;
+	}
+	gaps = document.getElementById("gaps").value ;
+	holes = document.getElementById("holes").value ;
+	missingTriangles = 0;
+	if( gaps > 0 )	{
+
+		for (i ; i < gaps ; i ++){
+			breakdown = document.getElementById("gapBreakdown-"+i).value;
+			if (breakdown >2){
+				missingTriangles += breakdown -2;
+			}
+		}
+	}
+	if( element.name == "triangles") {
 		/* the only time we change vertex count is when face values are changed
 			otherwize triangle count is always changed
 			*/
-		gaps = document.getElementById("gaps").value ;
-		holes = document.getElementById("holes").value ;
+	//	gaps = document.getElementById("gaps").value ;
+	//	holes = document.getElementById("holes").value ;
 		triangles = document.getElementById("triangles").value ;
-		chi = 2 - 2*holes - gaps ;
+		chi = 2 - 2*holes - missingTriangles ;
 		vertices = triangles/2 + chi ;
 		document.getElementById("vertices").value = vertices ;
 	}
@@ -41,13 +74,14 @@ function processFunction(element){
 			Holes can exist in closed surface. essentialy if it is possible to cut along an edge loop
 			without seperating geometry into two then that is a hole.
 			*/
-		gaps = document.getElementById("gaps").value ;
-		holes = document.getElementById("holes").value ;
 		vertices = document.getElementById("vertices").value ;
 		chi = 2 - 2*holes ;
-		triangles = vertices*2 - 2*chi -gaps ;
+		triangles = vertices*2 - 2*chi -missingTriangles ;
 		document.getElementById("triangles").value = triangles ;
-		document.getElementById("demo").innerHTML = "output " + triangles ;
+		i=0;
+		//breakdown = document.getElementById("gapBreakdown-"+i).value;
+		//i=0;
+		//document.getElementById("demo").innerHTML = document.getElementById("gapBreakdown-"+i).value;
 	}
 }
 </script>
