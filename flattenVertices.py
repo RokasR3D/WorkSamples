@@ -1,6 +1,24 @@
+""" verticesToPlane.py
+-Usage:
+    This script creates a window on loading
+    The interface has three buttons:
+    --- "set plane"
+        Expects for three vertices to be selected,
+        these vertices will define the plane other vertices will snap to.
+        Creates annotations to mark the selected vertices
+    --- "move vertices"
+        Moves the selected vertices to the plane defined by the "set plane" button
+    --- "clear"
+        Removes annotations created by the "set plane" button
+Tested on: maya 2016 trial version
+Made by: Rokas Rakauskas
+"""
+
 import pymel.core as pm
 
 class flattenWin():
+    """Class that creates the window
+    """
     def __init__ (self):
         # initialise class variables
         self.winTitle = "flattenVertices"
@@ -12,6 +30,7 @@ class flattenWin():
         self.layername = "annotateLayer"
         self.cleanUp()
 
+        #UI
         win = pm.window(self.winTitle)
         layout = pm.columnLayout()
         btnWidth = 200
@@ -25,6 +44,9 @@ class flattenWin():
         pm.scriptJob(uiDeleted=[self.winTitle, self.cleanUp])
 
     def cleanUp(self, *args):
+        """Removes annotations
+        Called by "reset" button
+        """
         if pm.objExists(self.layername):
             layerObj = pm.PyNode(self.layername)
             if layerObj.type() ==  "displayLayer":
@@ -33,6 +55,9 @@ class flattenWin():
                 pm.delete(layerObj)
 
     def setButtonPress(self, *args):
+        """Sets the plane we'll be snapping to from the three selected vertices
+        Called by "set plane" button
+        """
         sel = pm.ls(selection=1, flatten=1)
         if len(sel) ==3:
             self.cleanUp()
@@ -51,8 +76,6 @@ class flattenWin():
             layerObj = pm.createDisplayLayer(name=self.layername, empty=1)
             for i, vtx  in enumerate(sel):
                 annotation = pm.annotate(vtx, tx="V%d" % (i+1), p=vtx.getPosition(space="world") )
-                #annTrans.setAttr("overrideEnabled", 1)
-                #annTrans.setAttr("overrideDisplayType", 2)
                 annotation.setAttr("overrideEnabled", 1)
                 annotation.setAttr("overrideColor", 17)
                 annTrans = annotation.getParent()
@@ -65,8 +88,12 @@ class flattenWin():
                              defaultButton="OK", dismissString="OK", cancelButton="OK")
 
     def moveButtonPress(self, *args):
+        """Moves the selected vertices to the plane defined by
+        Called by "move vertices" button
+        """
         if self.normal.length > 0:
             sel = pm.ls(sl=1, fl=1)
+            #move vertices along the normal to snap to plane
             for vtx in sel:
                 pos = vtx.getPosition()
                 #vector from the plane position to the current vertex
